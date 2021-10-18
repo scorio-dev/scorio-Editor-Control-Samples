@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<title>Sample: Basic Score Editor</title>
+
+<script type='application/javascript' src='https://www.scorio.com/api/ScorioEditorControl.js'></script>
+<div id='scorio-editor-control-wrapper'></div>
+
+<script type='application/javascript' >
+
+  const wrapper = document.getElementById('scorio-editor-control-wrapper');
+
+  const control = new ScorioEditorControl();
+  const musicxml = null;
+  const options = new Object();
+  options.height = '500px';
+  options.showFileMenu = false;
+   
+  control.open(wrapper, musicxml, options)
+         .then(ev => {          }) 
+         .catch(err => { window.alert("ERROR opening socrio Editor Control\n" + err); });
+
+</script>

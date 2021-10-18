@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<title>Sample: Upload/Download Score</title>
+
+<script type='application/javascript' src='http://www.scorio.com/api/ScorioEditorControl.js'></script>
+
+<script type='application/javascript' src='scorio-api-utils.js'></script>
+<div id='scorio-editor-control-wrapper' style='height: calc(100vh - 100px); margin-bottom: 5px;'></div>
+
+<div style='display: flex; justify-content: center; margin: 10px;'>
+  <button id='download-button' disabled onclick='downloadScore()'>Download Score as MusicXML</button>
+  <label for='upload-button'>Upload MusicXML:</label>
+  <input id='upload-button' disabled type='file' onchange='scorioUtils.handleUpload(this.files[0], fileContents => control.setScore(fileContents))'>
+</div>
+
+<script type='application/javascript' >
+
+  function downloadScore(filename, text) {
+	const timeStamp = scorioUtils.localizedTimestamp(new Date());
+	const fileName = "score-" + timeStamp + ".musicxml";
+    control.getScore()
+      .then(ev => scorioUtils.downloadFile(fileName, ev.musicxml))
+      .catch(err => window.alert("ERROR download of score failed\n" + err));
+  }
+
+  const wrapper = document.getElementById('scorio-editor-control-wrapper');
+  const downloadButton = document.getElementById('download-button');
+  const uploadButton = document.getElementById('upload-button');
+
+  const control = new ScorioEditorControl();
+  const musicxml = null;
+  const options = new Object();
+  options.height = "100%";
+  options.showFileMenu = false;
+   
+  control.open(wrapper, musicxml, options)
+         .then(ev => { 
+            downloadButton.removeAttribute('disabled'); 
+            uploadButton.removeAttribute('disabled'); 
+         }) 
+         .catch(ev => { window.alert("ERROR opening socrio Editor Control\n" + err); });
+</script>

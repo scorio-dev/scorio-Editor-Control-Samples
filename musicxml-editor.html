@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<title>Sample: Visual MusicXML Editor</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+
+<script type='application/javascript' src='http://www.scorio.com/api/ScorioEditorControl.js'></script>
+
+<script type='application/javascript' src='scorio-api-utils.js'></script>
+
+<div id="buttons"
+	style="width: 1005px; margin: 20px auto; border: 1px solid darkseagreen">
+	<button type="button" onclick="openEditorControl().catch(ev => window.alert(ev.errormessage))">(Re-)Open Editor</button>
+	<button type="button" onclick="editor.close()">Close
+		Editor</button>
+	<button type="button"
+		onclick="editor.setScore(musicXml).then(ev => onScoreSet(ev)).catch(ev => window.alert(ev.errormessage))">Reset to
+		inital Score</button>
+	<button type="button"
+		onclick="editor.getPdfUrl().then(ev => onPdfGotten(ev)).catch(ev => window.alert(ev.errormessage)); 
+	             showPdfButton.setAttribute('disabled', '');
+	             showPdfButton.innerText = 'Wait ...';
+	             showPdfButton.style.cursor = 'wait';">Get PDF</button>
+	<button type="button" disabled id="showPdfButton"
+		onclick="window.open(pdfurl, '_blank')">Show PDF</button>
+</div>
+
+<div id="scorio-editor-control-wrapper" style="width: 1005px; margin: 0px auto;">
+	<div style="font-family: cursive; margin:bottom: 3px;">
+		<b>scorio Editor Control</b>
+	</div>
+</div>
+
+<div style="overflow: auto; width: 1005px; margin: 20px auto;">
+	<div style="font-family: cursive; margin-bottom: 3px;">
+		<b>Editable MIDI Data URL (containing base64 encoded standard MIDI file)</b>
+		<div style="float: right">
+		<button type="button"
+		onclick="editor.getMidi().then(ev => midiDataUrlTextarea.value = ev.midi).catch(ev => window.alert(ev.errormessage))">Get MIDI
+		</button>
+		<button type="button"
+			onclick="editor.setMidi(midiDataUrlTextarea.value).then(ev => onMidiSet(ev)).catch(ev => window.alert(ev.errormessage))">Set MIDI
+		</button>
+		<button type="button"
+			onclick="editor.playMidi(midiDataUrlTextarea.value).then(ev => {}).catch(ev => window.alert(ev.errormessage))">Play MIDI
+		</button>
+			<button type="button" onclick="copyToClipboard(midiDataUrlTextarea, 'text')">Copy</button>
+		</div>
+	</div>
+	<textarea id="midiDataUrlTextarea"
+		style="width: 1005px; height: 40px; resize: none; box-sizing: border-box; white-space: nowrap;"
+		autocomplete="off" autocorrect="off" autocapitalize="off"
+		spellcheck="false"></textarea>
+</div>
+
+<div style="overflow: auto; width: 1005px; margin: 20px auto;">
+	<div style="font-family: cursive; margin-bottom: 3px;">
+		<b>Editable MusicXML Score</b>
+		<div style="float: right">
+			<button type="button" onclick="editor.getScore().then(ev => onScoreGotten(ev)).catch(ev => window.alert(ev.errormessage))">Get Score</button>
+			<button type="button" onclick="editor.setScore(musicXmlTextarea.value).then(ev => onScoreSet(ev)).catch(ev => window.alert(ev.errormessage))">Set Score</button>
+			<button type="button" onclick="copyToClipboard(musicXmlTextarea,'text')">Copy</button>
+			<button type="button" onclick="copyToClipboard(musicXmlTextarea, 'quoted')">Copy as Java(-script) String</button>
+		</div>
+	</div>
+	<textarea id="musicXmlTextarea"
+		style="width: 1005px; height: 400px; resize: none; box-sizing: border-box;"
+		autocomplete="off" autocorrect="off" autocapitalize="off"
+		spellcheck="false"></textarea>
+</div>
+
+<script type="text/javascript">
+
+	if (typeof ScorioEditorControl === "undefined") {
+		   alert("Error: ScorioEditorControl API not present. Forgot to include ScorioEditorControl.js into page?");
+	} 
+
+   var musicXml = 
+	   "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + 
+	   "<!DOCTYPE score-partwise PUBLIC \"-//Recordare//DTD MusicXML 2.0 Partwise//EN\" \"http://www.musicxml.org/dtds/partwise.dtd\">" + 
+	   "<score-partwise version=\"2.0\">" + 
+	   "    <movement-title>Eurovision</movement-title>" + 
+	   "    <identification>" + 
+	   "        <creator type=\"composer\"></creator>" + 
+	   "        <encoding>" + 
+	   "            <software>scorio</software>" + 
+	   "            <software>www.scorio.com</software>" + 
+	   "            <encoding-date>2021-07-17</encoding-date>" + 
+	   "        </encoding>" + 
+	   "    </identification>" + 
+	   "    <part-list>" + 
+	   "        <score-part id=\"P1\">" + 
+	   "            <part-name></part-name>" + 
+	   "            <part-abbreviation></part-abbreviation>" + 
+	   "            <score-instrument id=\"P1-I1\">" + 
+	   "                <instrument-name>trombone</instrument-name>" + 
+	   "            </score-instrument>" + 
+	   "            <midi-instrument id=\"P1-I1\">" + 
+	   "                <midi-program>58</midi-program>" + 
+	   "                <volume>71</volume>" + 
+	   "            </midi-instrument>" + 
+	   "        </score-part>" + 
+	   "    </part-list>" + 
+	   "    <part id=\"P1\">" + 
+	   "        <measure implicit=\"yes\" number=\"0\">" + 
+	   "            <attributes>" + 
+	   "                <divisions>480</divisions>" + 
+	   "                <key number=\"1\">" + 
+	   "                    <fifths>2</fifths>" + 
+	   "                    <mode>major</mode>" + 
+	   "                </key>" + 
+	   "                <time symbol=\"normal\">" + 
+	   "                    <beats>2</beats>" + 
+	   "                    <beat-type>4</beat-type>" + 
+	   "                </time>" + 
+	   "                <staves>1</staves>" + 
+	   "                <clef number=\"1\">" + 
+	   "                    <sign>G</sign>" + 
+	   "                    <line>2</line>" + 
+	   "                </clef>" + 
+	   "                <transpose>" + 
+	   "                    <diatonic>0</diatonic>" + 
+	   "                    <chromatic>0</chromatic>" + 
+	   "                    <octave-change>0</octave-change>" + 
+	   "                </transpose>" + 
+	   "            </attributes>" + 
+	   "            <note>" + 
+	   "                <pitch>" + 
+	   "                    <step>A</step>" + 
+	   "                    <octave>4</octave>" + 
+	   "                </pitch>" + 
+	   "                <duration>480</duration>" + 
+	   "                <voice>1</voice>" + 
+	   "                <type>quarter</type>" + 
+	   "                <staff>1</staff>" + 
+	   "            </note>" + 
+	   "        </measure>" + 
+	   "        <measure number=\"1\">" + 
+	   "            <note>" + 
+	   "                <pitch>" + 
+	   "                    <step>D</step>" + 
+	   "                    <octave>5</octave>" + 
+	   "                </pitch>" + 
+	   "                <duration>480</duration>" + 
+	   "                <voice>1</voice>" + 
+	   "                <type>quarter</type>" + 
+	   "                <staff>1</staff>" + 
+	   "            </note>" + 
+	   "            <note>" + 
+	   "                <pitch>" + 
+	   "                    <step>D</step>" + 
+	   "                    <octave>5</octave>" + 
+	   "                </pitch>" + 
+	   "                <duration>240</duration>" + 
+	   "                <voice>1</voice>" + 
+	   "                <type>eighth</type>" + 
+	   "                <staff>1</staff>" + 
+	   "            </note>" + 
+	   "            <note>" + 
+	   "                <pitch>" + 
+	   "                    <step>E</step>" + 
+	   "                    <octave>5</octave>" + 
+	   "                </pitch>" + 
+	   "                <duration>240</duration>" + 
+	   "                <voice>1</voice>" + 
+	   "                <type>eighth</type>" + 
+	   "                <staff>1</staff>" + 
+	   "            </note>" + 
+	   "        </measure>" + 
+	   "        <measure number=\"2\">" + 
+	   "            <note>" + 
+	   "                <pitch>" + 
+	   "                    <step>F</step>" + 
+	   "                    <alter>1</alter>" + 
+	   "                    <octave>5</octave>" + 
+	   "                </pitch>" + 
+	   "                <duration>480</duration>" + 
+	   "                <voice>1</voice>" + 
+	   "                <type>quarter</type>" + 
+	   "                <staff>1</staff>" + 
+	   "            </note>" + 
+	   "            <note>" + 
+	   "                <pitch>" + 
+	   "                    <step>D</step>" + 
+	   "                    <octave>5</octave>" + 
+	   "                </pitch>" + 
+	   "                <duration>480</duration>" + 
+	   "                <voice>1</voice>" + 
+	   "                <type>quarter</type>" + 
+	   "                <staff>1</staff>" + 
+	   "            </note>" + 
+	   "        </measure>" + 
+	   "        <measure number=\"3\">" + 
+	   "            <note>" + 
+	   "                <pitch>" + 
+	   "                    <step>A</step>" + 
+	   "                    <octave>5</octave>" + 
+	   "                </pitch>" + 
+	   "                <duration>960</duration>" + 
+	   "                <voice>1</voice>" + 
+	   "                <type>half</type>" + 
+	   "                <staff>1</staff>" + 
+	   "            </note>" + 
+	   "        </measure>" + 
+	   "        <measure number=\"4\">" + 
+	   "            <note>" + 
+	   "                <pitch>" + 
+	   "                    <step>F</step>" + 
+	   "                    <alter>1</alter>" + 
+	   "                    <octave>5</octave>" + 
+	   "                </pitch>" + 
+	   "                <duration>960</duration>" + 
+	   "                <voice>1</voice>" + 
+	   "                <type>half</type>" + 
+	   "                <staff>1</staff>" + 
+	   "            </note>" + 
+	   "        </measure>" + 
+	   "    </part>" + 
+	   "</score-partwise>";
+    
+    function copyToClipboard(textArea, style) {
+    	let text = textArea.value;
+    	let textTop = textArea.scrollTop;
+    	if ('quoted' == style) {
+    		textArea.value = "\"" + text.replace(/\\/g, '\\\\').replace(/"/g, '\\\"').replace(/\n/g, "\" + \n\"") + "\"";
+    	}
+		textArea.focus();
+		let end = textArea.value.length;
+		textArea.setSelectionRange(0, end);
+    	document.execCommand('copy');
+    	textArea.value = text;
+    	textArea.blur();
+    	textArea.scrollTop = textTop;
+    }
+    
+    
+    async function openEditorControl() {
+       if (editor) {
+       		editor.close();
+       }
+	   editor = new ScorioEditorControl(); 
+	   editor.logging = true;
+	   
+       var scorioBrowserWrapper = document.getElementById("scorio-editor-control-wrapper");
+	   var options = new Object();
+	   options.height = 500;
+	   
+	   await editor.open(scorioBrowserWrapper, musicXml, options)
+   	   .then(ev => { 
+	   		editor.getScore().then(ev => {		  
+	      		musicXmlTextarea.value = ev.musicxml;
+	      		editor.getMidi().then(ev => {
+	      			midiDataUrlTextarea.value = ev.midi;
+	      		});
+	   		});
+	   	});
+   }
+    
+   function onScoreSet(ev) {
+    	console.info("XXX onScoreSet()");
+    }
+   
+   function onMidiSet(ev) {
+   		console.info("XXX onMidiSet()");
+   }
+   
+   function onPdfGotten(ev) {
+	   	console.info("XXX onPdfGotten()");
+ 
+		showPdfButton.removeAttribute('disabled');
+		showPdfButton.innerText = 'Show PDF';
+  		showPdfButton.style.cursor = 'unset';
+		pdfurl = ev.pdfurl;
+   }
+   
+   function onScoreGotten(ev) {
+      console.info("XXX onScoreGotten()");
+      
+      musicXmlTextarea.value = ev.musicxml;
+   }
+   
+   var showPdfButton = document.getElementById("showPdfButton");
+   var musicXmlTextarea = document.getElementById("musicXmlTextarea");
+   var midiDataUrlTextarea = document.getElementById("midiDataUrlTextarea");
+   var editor = null;
+   
+   openEditorControl();
+   
+</script>

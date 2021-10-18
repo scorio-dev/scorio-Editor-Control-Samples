@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<title>Sample: Basic Score Editor</title>
+
+<script type='application/javascript' src='http://www.scorio.com/api/ScorioEditorControl.js'></script>
+<script type='application/javascript' src='scorio-api-utils.js'></script>
+
+<div id='scorio-editor-control-wrapper'></div>
+<div id='score-info'></div>
+
+<script type='application/javascript' >
+
+  const wrapper = document.getElementById('scorio-editor-control-wrapper');
+  const scoreInfo = document.getElementById('score-info');
+  
+  const control = new ScorioEditorControl();
+  const musicxml = null;
+  const options = new Object();
+  options.height = '500px';
+  options.showFileMenu = false;
+   
+  control.open(wrapper, musicxml, options)
+         .then(ev => {  displayScoreInfo(ev); control.onScoreChanged = displayScoreInfo; }) 
+         .catch(err => { window.alert("ERROR opening socrio Editor Control\n" + err); });
+  
+  function displayScoreInfo(ev) {
+	  score = new ScorioMusicXML(ev.musicxml);
+	  const melody = score.getMelody().map(xmlNote => score.noteName(xmlNote));
+	  const title = score.getXMLDoc().querySelector('movement-title');
+	  scoreInfo.innerText = "Score Title:\n" + title.innerHTML + "\n\nMelody: " + melody;
+
+  }
+
+</script>

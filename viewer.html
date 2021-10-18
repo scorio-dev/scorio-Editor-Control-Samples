@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<title>Sample: Score Viewer</title>
+
+<script type='application/javascript' src='https://www.scorio.com/api/ScorioEditorControl.js'></script>
+<script type='application/javascript' src='scorio-api-utils.js'></script>
+<script type='application/javascript' src='sample-scores.js'></script>
+
+<div style='display: flex; justify-content: center; margin: 10px;'>
+  <button disabled onclick='enableButtons(false); control.setScore(sampleScoreXML[0]).then(ev => enableButtons(true))'>Sitz' ich im Gras, Franz Schubert</button>
+  <button disabled onclick='enableButtons(false); control.setScore(sampleScoreXML[1]).then(ev => enableButtons(true))'>The Entertainer, Scott Joplin</button>
+  <button disabled onclick='enableButtons(false); control.setScore(sampleScoreXML[2]).then(ev => enableButtons(true))'>Hinematov, Rainer Oberbeck</button>
+</div>
+
+<div id='scorio-editor-control-wrapper' style='height: calc(100vh - 40px)'></div>
+
+<script type='application/javascript' >
+
+  function enableButtons(enable) {
+	const buttons = Array.from(document.getElementsByTagName('button'));
+	if (enable) {
+		buttons.map(b => b.removeAttribute('disabled'));
+	}  else {
+		buttons.map(b => b.setAttribute('disabled', ""));
+	}
+  }
+  
+  const wrapper = document.getElementById('scorio-editor-control-wrapper');
+
+  const control = new ScorioEditorControl();
+  const musicxml = sampleScoreXML[2];
+  const options = control.getOptions(false);
+
+  options.height = '100%';
+  options.showPlayer = true;
+  
+  control.open(wrapper, musicxml, options)
+         .then(ev => { enableButtons(true); }) 
+         .catch(err => { window.alert("ERROR opening socrio Editor Control\n" + err); });
+  
+
+</script>
